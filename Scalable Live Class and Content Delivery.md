@@ -1,12 +1,12 @@
-# 📈 High-Level Design: Scalable Live Class & Content Delivery Platform
+# High-Level Design: Scalable Live Class & Content Delivery Platform
 
-## 🌟 Objective
+## Objective
 
 Design a scalable and reliable architecture for a modern EdTech platform that supports real-time live classes, on-demand content, and real-time user progress tracking, built with a monorepo (Turborepo) using Node.js, Next.js, PostgreSQL, Redis, Azure Tables, and WebSockets.
 
 ---
 
-## 📆 Key Requirements Recap
+## Key Requirements Recap
 
 | Feature            | Details                                                                |
 | ------------------ | ---------------------------------------------------------------------- |
@@ -19,7 +19,7 @@ Design a scalable and reliable architecture for a modern EdTech platform that su
 
 ---
 
-## 🕊️ High-Level Architecture Diagram (Text Version)
+## High-Level Architecture Diagram
 
 ```
                       +----------------------+        +------------------+
@@ -54,7 +54,7 @@ Design a scalable and reliable architecture for a modern EdTech platform that su
 
 ---
 
-## 📒 Component Overview
+## Component Overview
 
 ### 1. **Next.js Frontends (Turborepo)**
 
@@ -99,7 +99,7 @@ Design a scalable and reliable architecture for a modern EdTech platform that su
 
 ---
 
-## 📊 ER Diagram (Simplified)
+## ER Diagram (Simplified)
 
 ```plantuml
 @startuml
@@ -162,7 +162,7 @@ Lesson -- LessonProgress
 
 ---
 
-## 💪 Tech Stack Utilization
+## Tech Stack Utilization
 
 | Technology                 | Usage                                                  |
 | -------------------------- | ------------------------------------------------------ |
@@ -175,7 +175,7 @@ Lesson -- LessonProgress
 
 ---
 
-## 🛡️ Scalability & Reliability
+## Scalability & Reliability
 
 ### Scalability
 
@@ -193,7 +193,7 @@ Lesson -- LessonProgress
 
 ---
 
-## 📝 Monorepo (Turborepo) Benefits
+## Monorepo (Turborepo) Benefits
 
 | Benefit               | Explanation                                                     |
 | --------------------- | --------------------------------------------------------------- |
@@ -204,7 +204,7 @@ Lesson -- LessonProgress
 
 ---
 
-## 🚀 Future Enhancements
+## Future Enhancements
 
 - Integrate Kafka for event streaming (lesson watched, quiz submitted)
 - Use TimeScaleDB for time-series analytics
@@ -212,6 +212,6 @@ Lesson -- LessonProgress
 
 ---
 
-## 📄 Conclusion
+## Conclusion
 
 This high-level design supports our goal of creating a robust, scalable EdTech platform capable of real-time interactivity and efficient content delivery for thousands of users using modern web architecture best practices.
