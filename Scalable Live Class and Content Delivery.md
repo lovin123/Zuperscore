@@ -1,210 +1,217 @@
-Here’s a detailed `README.md` file for your **High-Level Design: Scalable Live Class & Content Delivery Platform**. This covers the architecture diagram (text-based), component explanations, technology usage, and how scalability, reliability, and real-time features are achieved.
+# 📈 High-Level Design: Scalable Live Class & Content Delivery Platform
+
+## 🌟 Objective
+
+Design a scalable and reliable architecture for a modern EdTech platform that supports real-time live classes, on-demand content, and real-time user progress tracking, built with a monorepo (Turborepo) using Node.js, Next.js, PostgreSQL, Redis, Azure Tables, and WebSockets.
 
 ---
 
-# 🎓 Scalable Live Class & Content Delivery Platform - High-Level Design
+## 📆 Key Requirements Recap
 
-## 📌 Objective
-
-Design a **scalable, real-time**, and **highly reliable** architecture to support:
-
-- Live classes with 1000+ concurrent users
-- On-demand content delivery
-- Real-time progress updates
-- Multi-role (Student, Tutor, Admin) apps using a **monorepo (Turborepo)** setup
+| Feature            | Details                                                                |
+| ------------------ | ---------------------------------------------------------------------- |
+| Live Classes       | Real-time video, chat, screen sharing, polls (1,000+ concurrent users) |
+| On-Demand Content  | Efficient streaming of pre-recorded lessons & learning materials       |
+| User Portfolios    | Personalized, real-time progress and course data                       |
+| Real-Time Updates  | Quiz scores, video progress instantly reflected                        |
+| Monorepo Structure | Turborepo-managed apps: Student, Admin, Tutor                          |
+| Tech Stack         | Node.js, Next.js, PostgreSQL, Azure Tables, Redis, WebSockets          |
 
 ---
 
-## 🗺️ High-Level Architecture Diagram
+## 🕊️ High-Level Architecture Diagram (Text Version)
 
 ```
-                ┌──────────────────────────────────────────────┐
-                │                  Frontend (Next.js)          │
-                │  ┌────────────┬────────────┬──────────────┐  │
-                │  │  Student   │   Tutor    │   Admin      │  │
-                │  └────────────┴────────────┴──────────────┘  │
-                └──────────────┬──────────────┬────────────────┘
-                               │              │
-                        API Gateway / BFF (Node.js)
-                               │
-          ┌────────────────────┼────────────────────────┐
-          │                    │                        │
- ┌────────▼─────┐      ┌───────▼────────┐       ┌───────▼────────┐
- │   Live Class │      │ Content Service│       │ Portfolio &    │
- │   Service    │      │ (Video + Docs) │       │ Progress       │
- │ (WebSocket)  │      └────────────────┘       │ Service        │
- └──────┬───────┘                               └───────┬────────┘
-        │                                              │
-        │ Real-Time Updates via WebSockets             │
-        │                                              │
-┌───────▼────────┐                             ┌───────▼─────────┐
-│   Redis        │   (Real-time events/cache)  │ PostgreSQL       │
-└────────────────┘                             └──────────────────┘
-             ▲                                         ▲
-             │                                         │
-     ┌───────┴──────┐                         ┌────────┴─────────┐
-     │ Azure Tables │                         │  External Services│
-     │  (Logs, Audit)│                         │  (Video CDN,     │
-     └──────────────┘                         │  Payments, etc.)  │
-                                              └───────────────────┘
+                      +----------------------+        +------------------+
+                      |    External Users    |<-----> |   CDN (Video)    |
+                      +----------+-----------+        +--------+---------+
+                                 |                             |
+                                 v                             v
+        +------------------------+-------------------------------+
+        |                Next.js Frontends (SSR, ISR)            |
+        |     Student / Tutor / Admin Apps via Turborepo        |
+        +------------+------------------+------------------------+
+                     |                  |
+                     v                  v
+           +---------+--+        +------+-----------+
+           |  API Gateway |       | WebSocket Server |
+           | (Node.js)    |       |   (Socket.IO)     |
+           +---------+--+        +--------+----------+
+                     |                     |
+     +---------------+--+        +--------+----------+
+     | Application Server |       |  Redis Pub/Sub    |
+     | (Node.js + BFF)   |       |  (Session/Chat)    |
+     +--------+----------+       +--------------------+
+              | \
+              |  \_____________________________________
+              |                                        |
+        +-----+-----+                            +-----+------+
+        | PostgreSQL |                            | Azure Tables |
+        | (Relational|                            | (Logging,    |
+        |  Data)     |                            |  Audit)      |
+        +-----------+                            +-------------+
 ```
 
 ---
 
-## 🧩 Major Components & Roles
+## 📒 Component Overview
 
-### 1. **Frontend (Next.js - Monorepo using Turborepo)**
+### 1. **Next.js Frontends (Turborepo)**
 
-- **Student App**: Live classes, on-demand content, personalized dashboard
-- **Tutor App**: Manage live sessions, create lessons/quizzes
-- **Admin App**: Platform management, moderation, analytics
-- **Monorepo with Turborepo**:
+- **Apps**: `student-app`, `tutor-app`, `admin-app`
+- Shared components/utilities live in `packages/`
+- SSR/ISR for course pages, dashboards
 
-  - Shared UI library
-  - Shared API client and auth packages
-  - Faster CI with caching and isolated builds
+### 2. **API Gateway (Node.js)**
 
----
+- Central entrypoint for REST APIs, auth
+- Middleware for rate limiting, validation, token checks
 
-### 2. **API Gateway / BFF Layer (Node.js)**
+### 3. **WebSocket Server (Socket.IO)**
 
-- Handles routing, auth, rate-limiting, and connects frontend with microservices
-- Common logic abstracted in reusable libraries within monorepo
+- Handles real-time chat, class participation, poll results
+- Redis-backed for multi-node scalability
 
----
+### 4. **Application Server (BFF Layer)**
 
-### 3. **Live Class Service (Node.js + WebSockets)**
+- Coordinates business logic
+- Talks to PostgreSQL, Redis, Azure Tables
 
-- Real-time features: video class join, chat, polling, screen sharing
-- Handles 1000+ concurrent users/class via horizontal scaling
-- Emits events to Redis for syncing with portfolios
+### 5. **PostgreSQL**
 
----
+- Stores user data, course progress, quiz scores, enrollments
+- Relationships and analytics
 
-### 4. **Content Service**
+### 6. **Azure Tables**
 
-- Serves on-demand video content (via external Video CDN)
-- Supports learning material downloads
-- Caches metadata for fast access using Redis
+- Logs, audit trails (e.g., video watch logs, class joins)
+- Inexpensive and horizontally scalable
 
----
+### 7. **Redis**
 
-### 5. **Portfolio & Progress Service**
+- Caching portfolio data for real-time reads
+- WebSocket session state
+- Leaderboards / poll data
 
-- Tracks:
+### 8. **CDN for Video (e.g., Azure Blob Storage + Azure CDN)**
 
-  - Video completions
-  - Quiz scores
-  - Course progress
-
-- Updates Redis cache and pushes changes via WebSocket to frontend
-- Data stored in **PostgreSQL**, change logs stored in **Azure Tables**
+- Pre-recorded video content stored and streamed at scale
 
 ---
 
-### 6. **Databases**
+## 📊 ER Diagram (Simplified)
 
-#### ✅ PostgreSQL
+```plantuml
+@startuml
+entity User {
+  user_id: UUID
+  name: string
+  role: enum(Student, Tutor, Admin)
+}
 
-- Core data storage: users, lessons, quizzes, progress, enrollments
-- Relational and analytical queries (reporting, dashboards)
+entity Course {
+  course_id: UUID
+  title: string
+  tutor_id: UUID
+}
 
-#### ✅ Azure Tables
+entity Lesson {
+  lesson_id: UUID
+  course_id: UUID
+  title: string
+  video_url: string
+}
 
-- Logging: class attendance, content access logs, audit trails
-- Cost-efficient for large volumes of semi-structured data
+entity Enrollment {
+  user_id: UUID
+  course_id: UUID
+  enrolled_at: timestamp
+}
 
-#### ✅ Redis
+entity LessonProgress {
+  user_id: UUID
+  lesson_id: UUID
+  watch_time: int
+  completed: boolean
+  last_updated: timestamp
+}
 
-- Real-time caching and pub/sub for:
+entity Quiz {
+  quiz_id: UUID
+  lesson_id: UUID
+  total_marks: int
+}
 
-  - Live class events
-  - User progress snapshots
-  - Leaderboards, presence detection
+entity QuizAttempt {
+  attempt_id: UUID
+  quiz_id: UUID
+  user_id: UUID
+  score: float
+  submitted_at: timestamp
+  answers: JSON
+}
 
----
-
-### 7. **External Integrations**
-
-- **Video Streaming/CDN**: e.g., Mux, Daily, Agora for low-latency video
-- **Payment Gateway**: Stripe/Razorpay integration
-- **Analytics & Monitoring**: DataDog, Azure Monitor
-
----
-
-## ⚙️ Technology Utilization
-
-| Component               | Technology         | Role                                              |
-| ----------------------- | ------------------ | ------------------------------------------------- |
-| Frontend                | Next.js (Monorepo) | UI for Student/Tutor/Admin with shared components |
-| Backend API             | Node.js            | Routes, auth, business logic                      |
-| Database                | PostgreSQL         | Persistent data storage                           |
-| Logging                 | Azure Tables       | Store logs, audit trails, analytics input         |
-| Real-time Communication | WebSockets, Redis  | Live classes, real-time updates, portfolio sync   |
-| CDN & Video             | 3rd-party APIs     | Fast video delivery, interactive live classes     |
-
----
-
-## 🚀 Scalability Strategy
-
-- **WebSockets Scaling**: Use load balancers + horizontal scaling of WebSocket nodes using sticky sessions
-- **Content CDN**: Pre-recorded videos delivered via edge-optimized CDN (e.g., Mux)
-- **Redis Pub/Sub**: For fan-out of live updates (polls, class messages, progress updates)
-- **Microservices**: Independent deployability for content, progress, and live services
-- **Turborepo Caching**: Faster CI/CD builds with isolated pipelines and incremental caching
-
----
-
-## ✅ Reliability Measures
-
-- **PostgreSQL Replication**: Multi-zone replicas and WAL backups
-- **Redis Sentinel or Azure Cache for Redis**: Failover-ready Redis cluster
-- **Retry Queues**: For delayed tasks or transient failures
-- **Monitoring & Alerting**: Alerting on CPU, memory, uptime, error rates
-- **Circuit Breakers & Rate Limiters**: Prevent cascading failures
-
----
-
-## 🔄 Real-Time Data Flow
-
-1. **Student watches a video** → Progress recorded locally → API updates Redis cache
-2. **Quiz submitted** → Score stored in PostgreSQL → Event sent to Redis → Frontend notified via WebSocket
-3. **Live class poll started** → Redis Pub/Sub notifies all connected clients
-4. **New material published** → Students’ dashboards updated instantly via WebSocket push
+User -- Enrollment
+Course -- Enrollment
+Course -- Lesson
+Lesson -- Quiz
+User -- QuizAttempt
+Lesson -- LessonProgress
+@enduml
+```
 
 ---
 
-## 🎯 Benefits of Monorepo (Turborepo)
+## 💪 Tech Stack Utilization
 
-- **Code Sharing**: Common UI, utils, and auth across apps
-- **Consistent Dependencies**: All apps use the same versions of libraries
-- **Streamlined CI/CD**: Only rebuild affected parts of the codebase
-- **Faster Developer Velocity**: One unified codebase, single source of truth
-
----
-
-## 📈 Future Enhancements
-
-- Add **Kafka/EventHub** for real-time data streaming into analytics
-- Move progress snapshots into **TimeScaleDB** for historical performance analysis
-- Enable **offline-first** support using service workers and IndexedDB
+| Technology                 | Usage                                                  |
+| -------------------------- | ------------------------------------------------------ |
+| **Node.js**                | API Gateway, BFF, Socket.IO servers                    |
+| **Next.js**                | Frontends (Turborepo) - student/tutor/admin apps       |
+| **PostgreSQL**             | Relational data - progress, enrollments, quiz results  |
+| **Azure Tables**           | Logging, audits, watch time, class joins               |
+| **Redis**                  | Cache portfolios, WebSocket sessions, poll & chat data |
+| **WebSockets (Socket.IO)** | Live classes, chats, real-time interactions            |
 
 ---
 
-## 👥 Team Structure Recommendation
+## 🛡️ Scalability & Reliability
 
-| Team               | Responsibilities                                |
-| ------------------ | ----------------------------------------------- |
-| Platform Team      | Monorepo infra, CI/CD, DevOps                   |
-| Live Class Team    | WebSocket infra, real-time logic                |
-| Content Team       | Video content ingestion, metadata delivery      |
-| Progress & Reports | Analytics, Portfolio, Engagement Tracking       |
-| Frontend Team      | UI for all roles with design system integration |
+### Scalability
+
+- **Horizontal scaling**: WebSocket and API nodes scaled via load balancer
+- **CDN usage**: Offloads video traffic
+- **Redis**: Reduces database pressure for real-time reads
+- **Azure Tables**: Schema-less, ideal for scaling logs and actions
+
+### Reliability
+
+- **PostgreSQL replication** for failover
+- **Redis cluster** to ensure uptime
+- **Circuit breakers** on external API calls
+- **Monitoring with Azure Monitor + custom alerts**
 
 ---
 
-Let me know if you'd like:
+## 📝 Monorepo (Turborepo) Benefits
 
-- ER diagrams for this setup
-- This as a downloadable `.md` file
-- Or a draw\.io / image version of the high-level architecture diagram
+| Benefit               | Explanation                                                     |
+| --------------------- | --------------------------------------------------------------- |
+| Shared components     | Reuse UI libraries, types, utilities across student/tutor/admin |
+| Simplified deployment | Atomic versioning and deployment pipelines                      |
+| Cross-app consistency | Centralize validation logic, BFF interactions                   |
+| Faster dev onboarding | Single repo to understand and contribute to                     |
+
+---
+
+## 🚀 Future Enhancements
+
+- Integrate Kafka for event streaming (lesson watched, quiz submitted)
+- Use TimeScaleDB for time-series analytics
+- AI layer to personalize learning based on tracked progress
+
+---
+
+## 📄 Conclusion
+
+This high-level design supports our goal of creating a robust, scalable EdTech platform capable of real-time interactivity and efficient content delivery for thousands of users using modern web architecture best practices.
