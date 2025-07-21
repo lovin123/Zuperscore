@@ -1,0 +1,22 @@
+{
+  "name": "quiz-backend",
+  "version": "1.0.0",
+  "description": "Intelligent Quiz Generation & Validation Backend Service (Node.js + Express + Zod)",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "uuid": "^9.0.0",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}

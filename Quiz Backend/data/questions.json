@@ -1,0 +1,54 @@
+[
+  {
+    "questionId": "q101",
+    "learningObjectiveId": "math_01",
+    "difficultyLevel": "EASY",
+    "text": "What is 2+2?",
+    "options": [
+      { "id": "a", "text": "3" },
+      { "id": "b", "text": "4" },
+      { "id": "c", "text": "5" },
+      { "id": "d", "text": "6" }
+    ],
+    "correctOptionId": "b"
+  },
+  {
+    "questionId": "q102",
+    "learningObjectiveId": "math_01",
+    "difficultyLevel": "EASY",
+    "text": "What is 3+5?",
+    "options": [
+      { "id": "a", "text": "7" },
+      { "id": "b", "text": "8" },
+      { "id": "c", "text": "9" },
+      { "id": "d", "text": "10" }
+    ],
+    "correctOptionId": "b"
+  },
+  {
+    "questionId": "q201",
+    "learningObjectiveId": "math_01",
+    "difficultyLevel": "MEDIUM",
+    "text": "What is 12/4?",
+    "options": [
+      { "id": "a", "text": "2" },
+      { "id": "b", "text": "3" },
+      { "id": "c", "text": "4" },
+      { "id": "d", "text": "5" }
+    ],
+    "correctOptionId": "b"
+  },
+  {
+    "questionId": "q301",
+    "learningObjectiveId": "math_02",
+    "difficultyLevel": "HARD",
+    "text": "What is the derivative of x^2?",
+    "options": [
+      { "id": "a", "text": "2x" },
+      { "id": "b", "text": "x" },
+      { "id": "c", "text": "x^2" },
+      { "id": "d", "text": "1" }
+    ],
+    "correctOptionId": "a"
+  }
+]
