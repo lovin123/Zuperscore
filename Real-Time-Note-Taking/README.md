@@ -2,7 +2,7 @@
 
 This is a collaborative, real-time note-taking application that allows multiple users to join a session and edit a document simultaneously. It features a rich text editor, live chat, and typing indicators to create a seamless collaborative experience.
 
-**Live Demo:** [**https://zuperscore-ashy.vercel.app/**](https://zuperscore-ashy.vercel.app/)
+**Live Demo:** [**https://zuperscore-ashy.vercel.app/**](https://zuperscore-nine.vercel.app/)
 
 ---
 
